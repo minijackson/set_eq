@@ -1,0 +1,21 @@
+[package]
+name = "set_eq"
+version = "0.1.0"
+authors = ["Minijackson <minijackson@riseup.net>"]
+
+[build-dependencies]
+lalrpop = "0.15.2"
+
+[dependencies]
+dbus = "0.6.2"
+
+clap = { git = "https://github.com/kbknapp/clap-rs", branch = "v3-master" }
+clap-verbosity-flag = "0.2"
+clap-log-flag = "0.1"
+structopt = "0.2"
+
+log = "0.4.4"
+failure = "0.1.2"
+
+lalrpop-util = "0.15.2"
+regex = "1.0.4"

@@ -1,0 +1,42 @@
+use ::Filter;
+
+use std::str::FromStr;
+
+grammar;
+
+pub Main: Filter = {
+    <preamp: Preamp> <eq: Eq> => {
+        let coefficients: Vec<_> = eq.1.iter().map(|decibel| 10f64.powf(decibel / 10f64)).collect();
+        // TODO: add decibel_to_ratio conversion function
+        let preamp = 10f64.powf(preamp / 10f64);
+        Filter { preamp, frequencies: eq.0, coefficients }
+    }
+}
+
+Preamp: f64 = {
+    "Preamp:" <Decibel>
+}
+
+Eq: (Vec<u32>, Vec<f64>) = {
+    "GraphicEQ:" <values:(<(Integer Float)> ";")+> <end:(Integer Float)> => {
+        let mut values = values;
+        values.push(end);
+        values.into_iter().unzip()
+    }
+}
+
+Decibel: f64 = {
+    <Float> "dB"
+}
+
+Float: f64 = {
+    <RawFloat>,
+    <SignedInteger> => <> as f64,
+    <Integer> => <> as f64,
+}
+
+RawFloat: f64 = r"-?[0-9]*\.[0-9]+" => f64::from_str(<>).unwrap();
+SignedInteger: i32 = r"-[0-9]+" => i32::from_str(<>).unwrap();
+Integer: u32 = r"[0-9]+"=> u32::from_str(<>).unwrap();
+
+// vim: ft=rust
