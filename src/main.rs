@@ -5,19 +5,11 @@ extern crate log;
 #[macro_use]
 extern crate failure;
 
+#[macro_use]
 extern crate clap;
 extern crate clap_log_flag;
 extern crate clap_verbosity_flag;
 extern crate structopt;
-
-use structopt::StructOpt;
-
-use failure::Error;
-
-//use dbus::stdintf::org_freedesktop_dbus::Properties;
-use dbus::Connection;
-
-use dbus_api::sink::OrgPulseAudioExtEqualizing1Equalizer;
 
 mod dbus_api;
 mod parsing;
@@ -25,31 +17,68 @@ mod utils;
 
 use utils::*;
 
-#[derive(StructOpt, Debug)]
-enum Command {
-    #[structopt(name = "load")]
-    Load(LoadCli),
-    #[structopt(name = "reset")]
-    Reset(ResetCli),
-}
+use dbus_api::sink::OrgPulseAudioExtEqualizing1Equalizer;
+use failure::Error;
+use structopt::StructOpt;
+
+use std::fs::File;
+use std::io;
 
 #[derive(StructOpt, Debug)]
-struct LoadCli {
-}
-
-#[derive(StructOpt, Debug)]
-struct ResetCli {
-}
-
-#[derive(StructOpt, Debug)]
+#[structopt(raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
+/// Hello World! How are you doing?
 struct Cli {
     #[structopt(flatten)]
     verbose: clap_verbosity_flag::Verbosity,
     #[structopt(flatten)]
     log: clap_log_flag::Log,
+    #[structopt(short = "s")]
+    /// Use the given sink.
+    ///
+    /// By default it will use the last equalized sink it finds
+    sink: Option<String>,
     #[structopt(subcommand)]
     cmd: Command,
 }
+
+#[derive(StructOpt, Debug)]
+enum Command {
+    #[structopt(name = "load",)]
+    /// Load and switch to a given equalizer configuration
+    Load(LoadCli),
+    #[structopt(name = "reset")]
+    /// Switch to a neutral equalizer
+    Reset(ResetCli),
+}
+
+#[derive(StructOpt, Debug)]
+struct LoadCli {
+    #[structopt(default_value = "-")]
+    /// The file from which to load the equalizer configuration
+    ///
+    /// If "-" is given, read the configuration from the command-line.
+    file: String,
+    #[structopt(
+        short = "f",
+        raw(
+            possible_values = "&EqualizerConfFormat::variants()",
+            case_insensitive = "true"
+        ),
+        default_value = "EqualizerAPO"
+    )]
+    /// The file format of the equalizer configuration
+    format: EqualizerConfFormat,
+}
+
+arg_enum! {
+    #[derive(Debug)]
+    enum EqualizerConfFormat {
+        EqualizerAPO
+    }
+}
+
+#[derive(StructOpt, Debug)]
+struct ResetCli {}
 
 #[derive(Fail, Debug)]
 #[fail(display = "No equalized sink found")]
@@ -88,7 +117,7 @@ fn main() -> Result<(), Error> {
 
     match args.cmd {
         Load(args) => load(args),
-        Reset(args)=> reset(args),
+        Reset(args) => reset(args),
     }
 }
 
@@ -110,23 +139,18 @@ fn reset(args: ResetCli) -> Result<(), Error> {
 fn load(args: LoadCli) -> Result<(), Error> {
     let conn = connect()?;
     let conn_sink = get_equalized_sink(&conn)?;
-    let filter = read_filter()?;
+
+    let filter = if args.file == "-" {
+        let stdin = io::stdin();
+        let mut lock = stdin.lock();
+        read_filter(&mut lock)?
+    } else {
+        let mut file = File::open(args.file)?;
+        read_filter(&mut file)?
+    };
+
     let filter_rate = conn_sink.get_filter_sample_rate()?;
     send_filter(&conn_sink, filter.pad(filter_rate))?;
 
     Ok(())
 }
-
-/*
-fn introspect(conn: &dbus::ConnPath<&Connection>) {
-    let mut thing = conn
-        .method_call_with_args(
-            &"org.freedesktop.DBus.Introspectable".into(),
-            &"Introspect".into(),
-            |_| {},
-        ).unwrap();
-    thing.as_result().unwrap();
-
-    println!("{}", thing.iter_init().read::<String>().unwrap());
-}
-*/
