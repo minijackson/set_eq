@@ -16,7 +16,7 @@ in {
         "hidden": false,
         "description": "set_eq Master branch",
         "nixexprinput": "src",
-        "nixexprpath": "default.nix",
+        "nixexprpath": "release.nix",
         "checkinterval": 60,
         "schedulingshares": 1,
         "enableemail": false,
