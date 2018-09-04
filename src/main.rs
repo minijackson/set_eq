@@ -14,74 +14,20 @@ extern crate structopt;
 
 extern crate lalrpop_util;
 
+mod cli;
 mod dbus_api;
 mod parsing;
 mod utils;
 
 use utils::*;
-
 use dbus_api::sink::OrgPulseAudioExtEqualizing1Equalizer;
+use cli::*;
+
 use failure::Error;
 use structopt::StructOpt;
 
 use std::fs::File;
 use std::io;
-
-#[derive(StructOpt, Debug)]
-#[structopt(raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
-/// Hello World! How are you doing?
-struct Cli {
-    #[structopt(flatten)]
-    verbose: clap_verbosity_flag::Verbosity,
-    #[structopt(flatten)]
-    log: clap_log_flag::Log,
-    #[structopt(short = "s")]
-    /// Use the given sink.
-    ///
-    /// By default it will use the last equalized sink it finds
-    sink: Option<String>,
-    #[structopt(subcommand)]
-    cmd: Command,
-}
-
-#[derive(StructOpt, Debug)]
-enum Command {
-    #[structopt(name = "load",)]
-    /// Load and switch to a given equalizer configuration
-    Load(LoadCli),
-    #[structopt(name = "reset")]
-    /// Switch to a neutral equalizer
-    Reset(ResetCli),
-}
-
-#[derive(StructOpt, Debug)]
-struct LoadCli {
-    #[structopt(default_value = "-")]
-    /// The file from which to load the equalizer configuration
-    ///
-    /// If "-" is given, read the configuration from the command-line.
-    file: String,
-    #[structopt(
-        short = "f",
-        raw(
-            possible_values = "&EqualizerConfFormat::variants()",
-            case_insensitive = "true"
-        ),
-        default_value = "EqualizerAPO"
-    )]
-    /// The file format of the equalizer configuration
-    format: EqualizerConfFormat,
-}
-
-arg_enum! {
-    #[derive(Debug)]
-    enum EqualizerConfFormat {
-        EqualizerAPO
-    }
-}
-
-#[derive(StructOpt, Debug)]
-struct ResetCli {}
 
 #[derive(Debug)]
 pub struct Filter {

@@ -5,6 +5,10 @@ authors = ["Minijackson <minijackson@riseup.net>"]
 
 [build-dependencies]
 lalrpop = "0.15.2"
+clap = "*"
+clap-verbosity-flag = "0.2"
+clap-log-flag = "0.1"
+structopt = "0.2"
 
 [dependencies]
 dbus = "0.6.2"
