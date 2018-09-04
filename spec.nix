@@ -1,7 +1,7 @@
-{ nixpkgs ? import <nixpkgs>, declInput }:
+{ nixpkgs ? <nixpkgs>, declInput }:
 
 let
-  pkgs = nixpkgs {
+  pkgs = import nixpkgs {
     config = {};
   };
 in {
