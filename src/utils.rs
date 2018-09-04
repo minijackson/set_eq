@@ -1,19 +1,18 @@
-use ::{Filter, NoEqualizedSink};
+use {Filter, NoEqualizedSink};
 
 use parsing::EqualizerApoParser;
 
-use ::dbus_api::equalizing_manager::OrgPulseAudioExtEqualizing1Manager;
-use ::dbus_api::server_lookup::OrgPulseAudioServerLookup1;
-use ::dbus_api::sink::OrgPulseAudioExtEqualizing1Equalizer;
+use dbus_api::equalizing_manager::OrgPulseAudioExtEqualizing1Manager;
+use dbus_api::server_lookup::OrgPulseAudioServerLookup1;
+use dbus_api::sink::OrgPulseAudioExtEqualizing1Equalizer;
 
-use dbus::{BusType, Connection, ConnPath};
+use dbus::{BusType, ConnPath, Connection};
 use failure::{Error, ResultExt};
 
 use std::io;
 
 pub fn connect() -> Result<Connection, Error> {
-    let pulse_sock_path =
-        get_pulse_dbus_sock().context("While looking up PulseAudio's D-Bus socket path")?;
+    let pulse_sock_path = get_pulse_dbus_sock()?;
     info!("PulseAudio's D-Bus socket path is: {}", pulse_sock_path);
 
     trace!("Connecting to PulseAudio's D-Bus socket");
@@ -46,7 +45,10 @@ pub fn send_filter(conn_sink: &ConnPath<&Connection>, filter: Filter) -> Result<
     Ok(())
 }
 
-pub fn read_filter<T>(file: &mut T) -> Result<Filter, Error> where T: io::Read {
+pub fn read_filter<T>(file: &mut T) -> Result<Filter, Error>
+where
+    T: io::Read,
+{
     let mut buffer = String::new();
 
     info!("Reading filter in GraphicEQ format from the command line");

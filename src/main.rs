@@ -19,7 +19,7 @@ mod utils;
 use utils::*;
 
 use dbus_api::sink::OrgPulseAudioExtEqualizing1Equalizer;
-use failure::Error;
+use failure::{Error, ResultExt};
 use structopt::StructOpt;
 
 use std::fs::File;
@@ -115,6 +115,9 @@ fn main() {
         Ok(()) => (),
         Err(err) => {
             eprintln!("Error: {}", err);
+            for cause in err.iter_causes() {
+                eprintln!("     : {}", cause);
+            }
             std::process::exit(-1);
         }
     }
@@ -133,8 +136,12 @@ fn start() -> Result<(), Error> {
 }
 
 fn reset(args: ResetCli) -> Result<(), Error> {
-    let conn = connect()?;
-    let conn_sink = get_equalized_sink(&conn)?;
+    let conn = connect().context(
+        "Could not connect to PulseAudio's D-Bus socket. Have you loaded the 'module-dbus-protocol' module?"
+    )?;
+    let conn_sink = get_equalized_sink(&conn).context(
+        "Could not find an equalized sink. Have you loaded the 'module-equalizer-sink' module?",
+    )?;
     let filter_rate = conn_sink.get_filter_sample_rate()?;
     let filter = Filter {
         preamp: 1f64,
@@ -148,8 +155,12 @@ fn reset(args: ResetCli) -> Result<(), Error> {
 }
 
 fn load(args: LoadCli) -> Result<(), Error> {
-    let conn = connect()?;
-    let conn_sink = get_equalized_sink(&conn)?;
+    let conn = connect().context(
+        "Could not connect to PulseAudio's D-Bus socket. Have you loaded the 'module-dbus-protocol' module?"
+    )?;
+    let conn_sink = get_equalized_sink(&conn).context(
+        "Could not find an equalized sink. Have you loaded the 'module-equalizer-sink' module?",
+    )?;
 
     let filter = if args.file == "-" {
         let stdin = io::stdin();
