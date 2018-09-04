@@ -46,7 +46,7 @@ pub fn send_filter(conn_sink: &ConnPath<&Connection>, filter: Filter) -> Result<
     Ok(())
 }
 
-pub fn read_filter(file: &mut impl io::Read) -> Result<Filter, Error> {
+pub fn read_filter<T>(file: &mut T) -> Result<Filter, Error> where T: io::Read {
     let mut buffer = String::new();
 
     info!("Reading filter in GraphicEQ format from the command line");

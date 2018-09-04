@@ -9,7 +9,8 @@ lalrpop = "0.15.2"
 [dependencies]
 dbus = "0.6.2"
 
-clap = { git = "https://github.com/kbknapp/clap-rs", branch = "v3-master" }
+#clap = { git = "https://github.com/kbknapp/clap-rs", branch = "v3-master" }
+clap = "*"
 clap-verbosity-flag = "0.2"
 clap-log-flag = "0.1"
 structopt = "0.2"

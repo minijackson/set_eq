@@ -9,6 +9,7 @@ extern crate failure;
 extern crate clap;
 extern crate clap_log_flag;
 extern crate clap_verbosity_flag;
+#[macro_use]
 extern crate structopt;
 
 mod dbus_api;
@@ -109,7 +110,17 @@ impl Filter {
     }
 }
 
-fn main() -> Result<(), Error> {
+fn main() {
+    match start() {
+        Ok(()) => (),
+        Err(err) => {
+            eprintln!("Error: {}", err);
+            std::process::exit(-1);
+        }
+    }
+}
+
+fn start() -> Result<(), Error> {
     let args = Cli::from_args();
     args.log.log_all(args.verbose.log_level())?;
 
@@ -142,8 +153,8 @@ fn load(args: LoadCli) -> Result<(), Error> {
 
     let filter = if args.file == "-" {
         let stdin = io::stdin();
-        let mut lock = stdin.lock();
-        read_filter(&mut lock)?
+        let mut handle = stdin.lock();
+        read_filter(&mut handle)?
     } else {
         let mut file = File::open(args.file)?;
         read_filter(&mut file)?

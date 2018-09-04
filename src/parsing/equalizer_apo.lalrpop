@@ -6,7 +6,7 @@ grammar;
 
 pub Main: Filter = {
     <preamp: Preamp> <eq: Eq> => {
-        let coefficients: Vec<_> = eq.1.iter().map(|decibel| 10f64.powf(decibel / 10f64)).collect();
+        let coefficients: Vec<_> = eq.1.iter().map(|decibel| 10f64.powf(decibel / 10f64).sqrt()).collect();
         // TODO: add decibel_to_ratio conversion function
         let preamp = 10f64.powf(preamp / 10f64);
         Filter { preamp, frequencies: eq.0, coefficients }
