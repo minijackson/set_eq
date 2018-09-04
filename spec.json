@@ -1,6 +1,6 @@
 {
 	"enabled": 1,
-	"hidden": false,
+	"hidden": true,
 	"description": "Jobsets",
 	"nixexprinput": "src",
 	"nixexprpath": "spec.nix",
