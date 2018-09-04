@@ -1,4 +1,4 @@
-use {Filter, NoEqualizedSink};
+use {EqualizerConfFormat, Filter};
 
 use parsing::EqualizerApoParser;
 
@@ -8,10 +8,33 @@ use dbus_api::sink::OrgPulseAudioExtEqualizing1Equalizer;
 
 use dbus::{BusType, ConnPath, Connection};
 use failure::{Error, ResultExt};
+use lalrpop_util;
 
+use std::fmt;
 use std::io;
 
+#[derive(Fail, Debug)]
+#[fail(display = "No equalized sink found")]
+struct NoEqualizedSink;
+
+#[derive(Fail, Debug)]
+#[fail(
+    display = "Could not parse using the {} format: {}",
+    format,
+    message
+)]
+struct ParseError {
+    format: EqualizerConfFormat,
+    message: String,
+}
+
 pub fn connect() -> Result<Connection, Error> {
+    Ok(connect_impl().context(
+        "Could not connect to PulseAudio's D-Bus socket. Have you loaded the 'module-dbus-protocol' module?"
+    )?)
+}
+
+fn connect_impl() -> Result<Connection, Error> {
     let pulse_sock_path = get_pulse_dbus_sock()?;
     info!("PulseAudio's D-Bus socket path is: {}", pulse_sock_path);
 
@@ -20,6 +43,14 @@ pub fn connect() -> Result<Connection, Error> {
 }
 
 pub fn get_equalized_sink<'a>(conn: &'a Connection) -> Result<ConnPath<'a, &'a Connection>, Error> {
+    Ok(get_equalized_sink_impl(conn).context(
+        "Could not find an equalized sink. Have you loaded the 'module-equalizer-sink' module?",
+    )?)
+}
+
+fn get_equalized_sink_impl<'a>(
+    conn: &'a Connection,
+) -> Result<ConnPath<'a, &'a Connection>, Error> {
     let conn_manager = conn.with_path("org.PulseAudio.Core1", "/org/pulseaudio/equalizing1", 2000);
 
     // TODO: make that a command-line option
@@ -55,10 +86,27 @@ where
     file.read_to_string(&mut buffer)?;
 
     // TODO: lifetime issue when "throwing" parse error
-    let filter = EqualizerApoParser::new().parse(&buffer).unwrap();
+    let filter = EqualizerApoParser::new()
+        .parse(&buffer)
+        .map_err(|e| convert_parse_error(EqualizerConfFormat::EqualizerAPO, e))?;
     trace!("Parsed filter: {:?}", filter);
 
     Ok(filter)
+}
+
+fn convert_parse_error<L, T, E>(
+    format: EqualizerConfFormat,
+    error: lalrpop_util::ParseError<L, T, E>,
+) -> ParseError
+where
+    L: fmt::Display,
+    T: fmt::Display,
+    E: fmt::Display,
+{
+    ParseError {
+        format,
+        message: format!("{}", error),
+    }
 }
 
 fn get_pulse_dbus_sock() -> Result<String, Error> {
