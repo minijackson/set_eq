@@ -25,6 +25,7 @@ in {
         "inputs": {
             "src": { "type": "git", "value": "https://git.huh.gdn/set_eq/ master", "emailresponsible": true },
             "nixpkgs": { "type": "git", "value": "https://github.com/nixos/nixpkgs-channels nixos-18.03", "emailresponsible": false }
+        }
       }
     }
     EOF
