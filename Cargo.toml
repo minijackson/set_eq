@@ -2,6 +2,7 @@
 name = "set_eq"
 version = "0.1.0"
 authors = ["Minijackson <minijackson@riseup.net>"]
+repository = "https://github.com/minijackson/set_eq"
 
 [build-dependencies]
 lalrpop = "0.15.2"
