@@ -1,5 +1,5 @@
-use clap_verbosity_flag;
 use clap_log_flag;
+use clap_verbosity_flag;
 use structopt;
 
 #[derive(StructOpt, Debug)]
@@ -10,7 +10,7 @@ pub struct Cli {
     pub verbose: clap_verbosity_flag::Verbosity,
     #[structopt(flatten)]
     pub log: clap_log_flag::Log,
-    #[structopt(short = "s")]
+    #[structopt(short = "s", long = "sink")]
     /// Use the given sink.
     ///
     /// By default it will use the last equalized sink it finds
@@ -21,16 +21,16 @@ pub struct Cli {
 
 #[derive(StructOpt, Debug)]
 pub enum Command {
-        #[structopt(name = "pa-eq")]
-        /// PulseAudio equalizer related commands
-        ///
-        /// Warning: the PulseAudio equalizer has been deprecated for a while,
-        /// and is known to sometimes cause crashes, latency or audible
-        /// artifacts
-        PaEq(pa_eq::Command),
-        #[structopt(name = "pa-effects")]
-        /// PulseEffects equalizer related commands
-        PaEffects(pa_effects::Command),
+    #[structopt(name = "pa-eq")]
+    /// PulseAudio equalizer related commands
+    ///
+    /// Warning: the PulseAudio equalizer has been deprecated for a while,
+    /// and is known to sometimes cause crashes, latency or audible
+    /// artifacts
+    PaEq(pa_eq::Command),
+    #[structopt(name = "pa-effects")]
+    /// PulseEffects equalizer related commands
+    PaEffects(pa_effects::Command),
 }
 
 arg_enum! {
@@ -45,7 +45,7 @@ pub mod pa_eq {
 
     #[derive(StructOpt, Debug)]
     pub enum Command {
-        #[structopt(name = "load",)]
+        #[structopt(name = "load")]
         /// Load and switch to a given equalizer configuration
         Load(LoadCli),
         #[structopt(name = "reset")]
@@ -62,6 +62,7 @@ pub mod pa_eq {
         pub file: String,
         #[structopt(
             short = "f",
+            long = "format",
             raw(
                 possible_values = "&EqualizerConfFormat::variants()",
                 case_insensitive = "true"
@@ -82,7 +83,7 @@ pub mod pa_effects {
 
     #[derive(StructOpt, Debug)]
     pub enum Command {
-        #[structopt(name = "export-preset",)]
+        #[structopt(name = "export-preset")]
         /// Export a PulseEffects preset
         ExportPreset(ExportPresetCli),
     }
@@ -96,6 +97,7 @@ pub mod pa_effects {
         pub file: String,
         #[structopt(
             short = "f",
+            long = "format",
             raw(
                 possible_values = "&EqualizerConfFormat::variants()",
                 case_insensitive = "true"
@@ -104,14 +106,14 @@ pub mod pa_effects {
         )]
         /// The file format of the equalizer configuration
         pub format: EqualizerConfFormat,
-        #[structopt(short = "p")]
+        #[structopt(short = "p", long = "base-preset")]
         /// Use a given file as a base for PulseEffects preset instead of the
         /// default one.
         ///
         /// If "-" is given, read the base preset from the command-line.
         pub base_preset: Option<String>,
-        #[structopt(short = "o")]
-        /// Write the preset to the given file, instead of the standard output
+        #[structopt(short = "o", long = "output")]
+        /// Write the preset to the given file instead of the standard output
         pub output: Option<String>,
     }
 
