@@ -1,5 +1,5 @@
 // auto-generated: "lalrpop 0.15.2"
-// sha256: a735e8f9bd5cf5f3aac915d12b24752d366481c3952258e22871eef395f44
+// sha256: 3981cad2c0ee5c1d80c3b7278bb1bc9926ee7b273c2b68423accdd84e43c494
 use ::Filter;
 use std::str::FromStr;
 #[allow(unused_extern_crates)]
@@ -879,12 +879,7 @@ fn __action1<
     (_, eq, _): (usize, (Vec<u32>, Vec<f64>), usize),
 ) -> Filter
 {
-    {
-        let coefficients: Vec<_> = eq.1.iter().map(|decibel| 10f64.powf(decibel / 10f64).sqrt()).collect();
-        // TODO: add decibel_to_ratio conversion function
-        let preamp = 10f64.powf(preamp / 10f64);
-        Filter { preamp, frequencies: eq.0, coefficients }
-    }
+    Filter { preamp, frequencies: eq.0, coefficients: eq.1 }
 }
 
 #[allow(unused_variables)]

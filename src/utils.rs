@@ -1,21 +1,14 @@
-use {EqualizerConfFormat, Filter};
+use Filter;
 
+use cli::EqualizerConfFormat;
 use parsing::EqualizerApoParser;
 
-use dbus_api::equalizing_manager::OrgPulseAudioExtEqualizing1Manager;
-use dbus_api::server_lookup::OrgPulseAudioServerLookup1;
-use dbus_api::sink::OrgPulseAudioExtEqualizing1Equalizer;
-
-use dbus::{BusType, ConnPath, Connection};
-use failure::{Error, ResultExt};
+use failure::Error;
 use lalrpop_util;
 
 use std::fmt;
+use std::fs::File;
 use std::io;
-
-#[derive(Fail, Debug)]
-#[fail(display = "No equalized sink found")]
-struct NoEqualizedSink;
 
 #[derive(Fail, Debug)]
 #[fail(
@@ -28,66 +21,32 @@ struct ParseError {
     message: String,
 }
 
-pub fn connect() -> Result<Connection, Error> {
-    Ok(connect_impl().context(
-        "Could not connect to PulseAudio's D-Bus socket. Have you loaded the 'module-dbus-protocol' module?"
-    )?)
-}
+pub fn read_filearg_to_str(file: &str) -> Result<String, Error> {
+    use std::io::Read;
 
-fn connect_impl() -> Result<Connection, Error> {
-    let pulse_sock_path = get_pulse_dbus_sock()?;
-    info!("PulseAudio's D-Bus socket path is: {}", pulse_sock_path);
-
-    trace!("Connecting to PulseAudio's D-Bus socket");
-    Ok(Connection::open_private(&pulse_sock_path)?)
-}
-
-pub fn get_equalized_sink<'a>(conn: &'a Connection) -> Result<ConnPath<'a, &'a Connection>, Error> {
-    Ok(get_equalized_sink_impl(conn).context(
-        "Could not find an equalized sink. Have you loaded the 'module-equalizer-sink' module?",
-    )?)
-}
-
-fn get_equalized_sink_impl<'a>(
-    conn: &'a Connection,
-) -> Result<ConnPath<'a, &'a Connection>, Error> {
-    let conn_manager = conn.with_path("org.PulseAudio.Core1", "/org/pulseaudio/equalizing1", 2000);
-
-    // TODO: make that a command-line option
-    trace!("Getting (one of) the equalized sink(s)");
-    let mut sinks = conn_manager.get_equalized_sinks()?;
-    let sink_path = sinks.pop().ok_or(NoEqualizedSink {})?;
-    info!("Using equalized sink: {:?}", sink_path.as_cstr());
-
-    trace!("Connecting to equalized sink");
-    Ok(conn.with_path("org.PulseAudio.Core1", sink_path, 2000))
-}
-
-pub fn send_filter(conn_sink: &ConnPath<&Connection>, filter: Filter) -> Result<(), Error> {
-    let channel = conn_sink.get_nchannels()?;
-    info!("Using channel: {}", channel);
-    trace!("Sending filter: {:?}", filter);
-    conn_sink.seed_filter(
-        channel,
-        filter.frequencies,
-        filter.coefficients,
-        filter.preamp,
-    )?;
-    Ok(())
-}
-
-pub fn read_filter<T>(file: &mut T) -> Result<Filter, Error>
-where
-    T: io::Read,
-{
     let mut buffer = String::new();
+    if file == "-" {
+        info!("Reading file from the command line");
+        let stdin = io::stdin();
+        let mut handle = stdin.lock();
+        handle.read_to_string(&mut buffer)?;
+    } else {
+        let mut file = File::open(file)?;
+        file.read_to_string(&mut buffer)?;
+    }
+    Ok(buffer)
+}
 
-    info!("Reading filter in GraphicEQ format from the command line");
-    file.read_to_string(&mut buffer)?;
+pub fn read_filter_from_arg(file: &str) -> Result<Filter, Error> {
+    debug!("Reading filter from '{}' in the EqualizerAPO format", file);
+    let content = read_filearg_to_str(file)?;
+    parse_filter(&content)
+}
 
+pub fn parse_filter(content: &str) -> Result<Filter, Error> {
     // TODO: lifetime issue when "throwing" parse error
     let filter = EqualizerApoParser::new()
-        .parse(&buffer)
+        .parse(&content)
         .map_err(|e| convert_parse_error(EqualizerConfFormat::EqualizerAPO, e))?;
     trace!("Parsed filter: {:?}", filter);
 
@@ -109,13 +68,8 @@ where
     }
 }
 
-fn get_pulse_dbus_sock() -> Result<String, Error> {
-    trace!("Connecting to the D-Bus' session bus");
-    let conn = Connection::get_private(BusType::Session)?;
-    let conn = conn.with_path("org.PulseAudio1", "/org/pulseaudio/server_lookup1", 2000);
-
-    trace!("Checking PulseAudio's D-Bus socket path");
-    Ok(conn.get_address()?)
+pub fn decibel_to_ratio(decibel: f64) -> f64 {
+    10f64.powf(decibel / 10f64).sqrt()
 }
 
 /*

@@ -14,20 +14,21 @@ extern crate structopt;
 
 extern crate lalrpop_util;
 
+#[macro_use]
+extern crate serde_json;
+
 mod cli;
 mod dbus_api;
 mod parsing;
 mod utils;
 
-use utils::*;
-use dbus_api::sink::OrgPulseAudioExtEqualizing1Equalizer;
+mod pa_eq;
+mod pa_effects;
+
 use cli::*;
 
 use failure::Error;
 use structopt::StructOpt;
-
-use std::fs::File;
-use std::io;
 
 #[derive(Debug)]
 pub struct Filter {
@@ -74,41 +75,7 @@ fn start() -> Result<(), Error> {
     use Command::*;
 
     match args.cmd {
-        Load(args) => load(args),
-        Reset(args) => reset(args),
+        PaEq(args) => pa_eq::main(args),
+        PaEffects(args) => pa_effects::main(args),
     }
-}
-
-fn reset(args: ResetCli) -> Result<(), Error> {
-    let conn = connect()?;
-    let conn_sink = get_equalized_sink(&conn)?;
-    let filter_rate = conn_sink.get_filter_sample_rate()?;
-    let filter = Filter {
-        preamp: 1f64,
-        frequencies: vec![],
-        coefficients: vec![],
-    }.pad(filter_rate);
-
-    send_filter(&conn_sink, filter)?;
-
-    Ok(())
-}
-
-fn load(args: LoadCli) -> Result<(), Error> {
-    let conn = connect()?;
-    let conn_sink = get_equalized_sink(&conn)?;
-
-    let filter = if args.file == "-" {
-        let stdin = io::stdin();
-        let mut handle = stdin.lock();
-        read_filter(&mut handle)?
-    } else {
-        let mut file = File::open(args.file)?;
-        read_filter(&mut file)?
-    };
-
-    let filter_rate = conn_sink.get_filter_sample_rate()?;
-    send_filter(&conn_sink, filter.pad(filter_rate))?;
-
-    Ok(())
 }
