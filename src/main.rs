@@ -1,5 +1,3 @@
-extern crate dbus;
-
 #[macro_use]
 extern crate log;
 #[macro_use]
@@ -14,15 +12,20 @@ extern crate structopt;
 
 extern crate lalrpop_util;
 
+#[cfg(feature = "pa-eq")]
+extern crate dbus;
+
+#[cfg(feature = "pa-effects")]
 #[macro_use]
 extern crate serde_json;
 
 mod cli;
-mod dbus_api;
 mod parsing;
 mod utils;
 
+#[cfg(feature = "pa-eq")]
 mod pa_eq;
+#[cfg(feature = "pa-effects")]
 mod pa_effects;
 
 use cli::*;
@@ -75,7 +78,9 @@ fn start() -> Result<(), Error> {
     use Command::*;
 
     match args.cmd {
+        #[cfg(feature = "pa-eq")]
         PaEq(args) => pa_eq::main(args),
+        #[cfg(feature = "pa-effects")]
         PaEffects(args) => pa_effects::main(args),
     }
 }

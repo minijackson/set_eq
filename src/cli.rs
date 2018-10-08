@@ -4,23 +4,19 @@ use structopt;
 
 #[derive(StructOpt, Debug)]
 #[structopt(raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
-/// Hello World! How are you doing?
+/// A command-line tool to manipulate PulseAudio's equalizers
 pub struct Cli {
     #[structopt(flatten)]
     pub verbose: clap_verbosity_flag::Verbosity,
     #[structopt(flatten)]
     pub log: clap_log_flag::Log,
-    #[structopt(short = "s", long = "sink")]
-    /// Use the given sink.
-    ///
-    /// By default it will use the last equalized sink it finds
-    pub sink: Option<String>,
     #[structopt(subcommand)]
     pub cmd: Command,
 }
 
 #[derive(StructOpt, Debug)]
 pub enum Command {
+    #[cfg(feature = "pa-eq")]
     #[structopt(name = "pa-eq")]
     /// PulseAudio equalizer related commands
     ///
@@ -28,6 +24,7 @@ pub enum Command {
     /// and is known to sometimes cause crashes, latency or audible
     /// artifacts
     PaEq(pa_eq::Command),
+    #[cfg(feature = "pa-effects")]
     #[structopt(name = "pa-effects")]
     /// PulseEffects equalizer related commands
     PaEffects(pa_effects::Command),
@@ -40,6 +37,7 @@ arg_enum! {
     }
 }
 
+#[cfg(feature = "pa-eq")]
 pub mod pa_eq {
     use super::EqualizerConfFormat;
 
@@ -71,13 +69,25 @@ pub mod pa_eq {
         )]
         /// The file format of the equalizer configuration
         pub format: EqualizerConfFormat,
+        #[structopt(short = "s", long = "sink")]
+        /// Use the given sink.
+        ///
+        /// By default it will use the last equalized sink it finds
+        pub sink: Option<String>,
     }
 
     #[derive(StructOpt, Debug)]
-    pub struct ResetCli {}
+    pub struct ResetCli {
+        #[structopt(short = "s", long = "sink")]
+        /// Use the given sink.
+        ///
+        /// By default it will use the last equalized sink it finds
+        pub sink: Option<String>,
+    }
 
 }
 
+#[cfg(feature = "pa-effects")]
 pub mod pa_effects {
     use super::EqualizerConfFormat;
 

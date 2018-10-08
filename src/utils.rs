@@ -26,7 +26,7 @@ pub fn read_filearg_to_str(file: &str) -> Result<String, Error> {
 
     let mut buffer = String::new();
     if file == "-" {
-        info!("Reading file from the command line");
+        debug!("Reading file from the command line");
         let stdin = io::stdin();
         let mut handle = stdin.lock();
         handle.read_to_string(&mut buffer)?;
@@ -38,7 +38,7 @@ pub fn read_filearg_to_str(file: &str) -> Result<String, Error> {
 }
 
 pub fn read_filter_from_arg(file: &str) -> Result<Filter, Error> {
-    debug!("Reading filter from '{}' in the EqualizerAPO format", file);
+    info!("Reading filter from '{}' in the EqualizerAPO format", file);
     let content = read_filearg_to_str(file)?;
     parse_filter(&content)
 }

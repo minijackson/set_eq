@@ -1,10 +1,12 @@
+mod dbus_api;
+
 use Filter;
 use cli::pa_eq::*;
 use utils::*;
 
-use dbus_api::equalizing_manager::OrgPulseAudioExtEqualizing1Manager;
-use dbus_api::server_lookup::OrgPulseAudioServerLookup1;
-use dbus_api::sink::OrgPulseAudioExtEqualizing1Equalizer;
+use self::dbus_api::equalizing_manager::OrgPulseAudioExtEqualizing1Manager;
+use self::dbus_api::server_lookup::OrgPulseAudioServerLookup1;
+use self::dbus_api::sink::OrgPulseAudioExtEqualizing1Equalizer;
 
 use dbus::{BusType, ConnPath, Connection};
 

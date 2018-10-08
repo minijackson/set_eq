@@ -19,8 +19,14 @@ pub fn main(cmd: Command) -> Result<(), Error> {
 fn export_preset(args: ExportPresetCli) -> Result<(), Error> {
     debug!("Parsing base preset");
     let mut preset: serde_json::Value = match args.base_preset {
-        Some(file) => serde_json::from_str(&read_filearg_to_str(&file)?),
-        None => serde_json::from_str(&DEFAULT_PRESET),
+        Some(file) => {
+            info!("Reading base PulseEffects preset from file '{}'", file);
+            serde_json::from_str(&read_filearg_to_str(&file)?)
+        }
+        None => {
+            info!("Using default PulseEffects preset");
+            serde_json::from_str(&DEFAULT_PRESET)
+        }
     }?;
 
     let filter = read_filter_from_arg(&args.file)?;
@@ -65,7 +71,7 @@ fn simplify_filter(filter: Filter) -> Filter {
     let mut partition_size = filter.frequencies.len() / 30;
     let step_error = filter.frequencies.len() as f64 % 30f64;
     if step_error != 0f64 {
-        info!("The approximation will be imperfect");
+        trace!("The approximation will be imperfect");
         partition_size += 1;
     }
 
