@@ -2,7 +2,9 @@
 name = "set_eq"
 version = "0.1.0"
 authors = ["Minijackson <minijackson@riseup.net>"]
+license = "MIT/Apache-2.0"
 repository = "https://github.com/minijackson/set_eq"
+description = "A command-line tool to manipulate PulseAudio's equalizers"
 
 [features]
 default = ["pa-eq", "pa-effects"]
