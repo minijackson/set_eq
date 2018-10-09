@@ -6,7 +6,7 @@ use failure::Error;
 
 use serde_json;
 
-const DEFAULT_PRESET: &'static str = include_str!("../res/default-pa-effects-preset.json");
+const DEFAULT_PRESET: &str = include_str!("../res/default-pa-effects-preset.json");
 
 pub fn main(cmd: Command) -> Result<(), Error> {
     use cli::pa_effects::Command::*;
@@ -40,7 +40,7 @@ fn export_preset(args: ExportPresetCli) -> Result<(), Error> {
 fn filter_to_eq_preset(mut filter: Filter) -> serde_json::Value {
     if filter.frequencies.len() > 30 {
         info!("More than 30 frequencies specified, taking the approximative approach");
-        filter = simplify_filter(filter);
+        filter = simplify_filter(&filter);
     }
 
     let mut equalizer: serde_json::Value = json!({
@@ -66,7 +66,7 @@ fn filter_to_eq_preset(mut filter: Filter) -> serde_json::Value {
     equalizer
 }
 
-fn simplify_filter(filter: Filter) -> Filter {
+fn simplify_filter(filter: &Filter) -> Filter {
     //let partition_size = (filter.frequencies.len() as f64 / 30f64).floor() as usize;
     let mut partition_size = filter.frequencies.len() / 30;
     let step_error = filter.frequencies.len() as f64 % 30f64;

@@ -47,7 +47,7 @@ pub fn parse_filter(content: &str) -> Result<Filter, Error> {
     // TODO: lifetime issue when "throwing" parse error
     let filter = EqualizerApoParser::new()
         .parse(&content)
-        .map_err(|e| convert_parse_error(EqualizerConfFormat::EqualizerAPO, e))?;
+        .map_err(|e| convert_parse_error(EqualizerConfFormat::EqualizerAPO, &e))?;
     trace!("Parsed filter: {:?}", filter);
 
     Ok(filter)
@@ -55,7 +55,7 @@ pub fn parse_filter(content: &str) -> Result<Filter, Error> {
 
 fn convert_parse_error<L, T, E>(
     format: EqualizerConfFormat,
-    error: lalrpop_util::ParseError<L, T, E>,
+    error: &lalrpop_util::ParseError<L, T, E>,
 ) -> ParseError
 where
     L: fmt::Display,

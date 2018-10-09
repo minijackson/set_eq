@@ -1,8 +1,8 @@
 mod dbus_api;
 
-use Filter;
 use cli::pa_eq::*;
 use utils::*;
+use Filter;
 
 use self::dbus_api::equalizing_manager::OrgPulseAudioExtEqualizing1Manager;
 use self::dbus_api::server_lookup::OrgPulseAudioServerLookup1;
@@ -35,7 +35,8 @@ pub fn reset(_args: ResetCli) -> Result<(), Error> {
         preamp: 1f64,
         frequencies: vec![],
         coefficients: vec![],
-    }.pad(filter_rate);
+    }
+    .pad(filter_rate);
 
     send_filter(&conn_sink, filter)?;
 
@@ -68,15 +69,13 @@ fn connect_impl() -> Result<Connection, Error> {
     Ok(Connection::open_private(&pulse_sock_path)?)
 }
 
-fn get_equalized_sink<'a>(conn: &'a Connection) -> Result<ConnPath<'a, &'a Connection>, Error> {
+fn get_equalized_sink(conn: &Connection) -> Result<ConnPath<&Connection>, Error> {
     Ok(get_equalized_sink_impl(conn).context(
         "Could not find an equalized sink. Have you loaded the 'module-equalizer-sink' module?",
     )?)
 }
 
-fn get_equalized_sink_impl<'a>(
-    conn: &'a Connection,
-) -> Result<ConnPath<'a, &'a Connection>, Error> {
+fn get_equalized_sink_impl(conn: &Connection) -> Result<ConnPath<&Connection>, Error> {
     let conn_manager = conn.with_path("org.PulseAudio.Core1", "/org/pulseaudio/equalizing1", 2000);
 
     // TODO: make that a command-line option
@@ -96,7 +95,11 @@ fn send_filter(conn_sink: &ConnPath<&Connection>, filter: Filter) -> Result<(), 
     conn_sink.seed_filter(
         channel,
         filter.frequencies,
-        filter.coefficients.into_iter().map(decibel_to_ratio).collect(),
+        filter
+            .coefficients
+            .into_iter()
+            .map(decibel_to_ratio)
+            .collect(),
         decibel_to_ratio(filter.preamp),
     )?;
     Ok(())
