@@ -62,9 +62,9 @@ fn main() {
     match start() {
         Ok(()) => (),
         Err(err) => {
-            eprintln!("Error: {}", err);
+            error!("{}", err);
             for cause in err.iter_causes() {
-                eprintln!("     : {}", cause);
+                error!("Caused by: {}", cause);
             }
             std::process::exit(-1);
         }
