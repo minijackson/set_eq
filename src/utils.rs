@@ -85,3 +85,16 @@ fn introspect(conn: &dbus::ConnPath<&Connection>) {
     println!("{}", thing.iter_init().read::<String>().unwrap());
 }
 */
+
+#[cfg(test)]
+mod tests {
+
+    #[test]
+    fn decibel_to_ratio() {
+        assert_eq!(super::decibel_to_ratio(0f64), 1f64);
+        assert_eq!(super::decibel_to_ratio(20f64), 10f64);
+        assert_eq!(super::decibel_to_ratio(40f64), 100f64);
+        assert_eq!(super::decibel_to_ratio(60f64), 1000f64);
+    }
+
+}
