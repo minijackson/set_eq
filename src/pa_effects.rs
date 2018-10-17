@@ -2,9 +2,11 @@ use cli::pa_effects::*;
 use utils::*;
 use Filter;
 
-use failure::Error;
+use failure::{Error, ResultExt};
 
 use serde_json;
+
+use std::io::{self, Write};
 
 const DEFAULT_PRESET: &str = include_str!("../res/default-pa-effects-preset.json");
 
@@ -33,7 +35,10 @@ fn export_preset(args: ExportPresetCli) -> Result<(), Error> {
 
     preset["output"]["equalizer"] = filter_to_eq_preset(filter);
 
-    println!("{}", preset);
+    let stdout = io::stdout();
+    let mut handle = stdout.lock();
+
+    writeln!(handle, "{}", preset).context("Could not output the PulseEffects preset")?;
     Ok(())
 }
 
