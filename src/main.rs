@@ -10,6 +10,7 @@ extern crate clap_verbosity_flag;
 #[macro_use]
 extern crate structopt;
 
+#[macro_use]
 extern crate lalrpop_util;
 
 #[cfg(feature = "pa-eq")]
@@ -73,7 +74,7 @@ fn main() {
 
 fn start() -> Result<(), Error> {
     let args = Cli::from_args();
-    args.log.log_all(args.verbose.log_level())?;
+    args.log.log_all(Some(args.verbose.log_level()))?;
 
     use Command::*;
 

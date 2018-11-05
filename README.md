@@ -1,5 +1,7 @@
 # set_eq: A command-line tool to manipulate PulseAudio's equalizers
 
+[![dependency status](https://deps.rs/repo/github/minijackson/set_eq/status.svg)](https://deps.rs/repo/github/minijackson/set_eq)
+
 This tool will allow you to use a configuration file to send to your favorite
 PulseAudio's equalizer.
 

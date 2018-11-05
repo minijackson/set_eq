@@ -7,7 +7,7 @@ rustPlatform.buildRustPackage rec {
   buildInputs = [ dbus pkgconfig ];
 
   src = ./.;
-  cargoSha256 = "130mvc2hbvfl0ia0mj5v33abrwnr9hhqrqrfxjwgxk2n1q9z1ay7";
+  cargoSha256 = "08s7s63rhjgirznphi6yks2a2zlsj5f4hlz8xqmla6gvc9yr58hc";
 
   preFixup = ''
     mkdir -p "$out/share/"{bash-completion/completions,fish/vendor_completions.d,zsh/site-functions}
