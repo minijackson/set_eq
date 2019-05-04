@@ -34,7 +34,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_address()));
+        a.append(r#try!(d.get_address()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -50,11 +50,11 @@ impl<'a, C: ::std::ops::Deref<Target=dbus::Connection>> OrgFreedesktopDBusIntros
     type Err = dbus::Error;
 
     fn introspect(&self) -> Result<String, Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.freedesktop.DBus.Introspectable".into(), &"Introspect".into(), |_| {
+        let mut m = r#try!(self.method_call_with_args(&"org.freedesktop.DBus.Introspectable".into(), &"Introspect".into(), |_| {
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         let mut i = m.iter_init();
-        let data: String = try!(i.read());
+        let data: String = r#try!(i.read());
         Ok(data)
     }
 }
@@ -71,7 +71,7 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let d = fclone(minfo);
-        let data = try!(d.introspect());
+        let data = r#try!(d.introspect());
         let rm = minfo.msg.method_return();
         let rm = rm.append1(data);
         Ok(vec!(rm))
@@ -93,36 +93,36 @@ impl<'a, C: ::std::ops::Deref<Target=dbus::Connection>> OrgFreedesktopDBusProper
     type Err = dbus::Error;
 
     fn get(&self, interface_name: &str, property_name: &str) -> Result<arg::Variant<Box<arg::RefArg>>, Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"Get".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"Get".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(interface_name);
             i.append(property_name);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         let mut i = m.iter_init();
-        let value: arg::Variant<Box<arg::RefArg>> = try!(i.read());
+        let value: arg::Variant<Box<arg::RefArg>> = r#try!(i.read());
         Ok(value)
     }
 
     fn set(&self, interface_name: &str, property_name: &str, value: arg::Variant<Box<arg::RefArg>>) -> Result<(), Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"Set".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"Set".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(interface_name);
             i.append(property_name);
             i.append(value);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         Ok(())
     }
 
     fn get_all(&self, interface_name: &str) -> Result<::std::collections::HashMap<String, arg::Variant<Box<arg::RefArg>>>, Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"GetAll".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"GetAll".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(interface_name);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         let mut i = m.iter_init();
-        let props: ::std::collections::HashMap<String, arg::Variant<Box<arg::RefArg>>> = try!(i.read());
+        let props: ::std::collections::HashMap<String, arg::Variant<Box<arg::RefArg>>> = r#try!(i.read());
         Ok(props)
     }
 }
@@ -139,10 +139,10 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let interface_name: &str = try!(i.read());
-        let property_name: &str = try!(i.read());
+        let interface_name: &str = r#try!(i.read());
+        let property_name: &str = r#try!(i.read());
         let d = fclone(minfo);
-        let value = try!(d.get(interface_name, property_name));
+        let value = r#try!(d.get(interface_name, property_name));
         let rm = minfo.msg.method_return();
         let rm = rm.append1(value);
         Ok(vec!(rm))
@@ -156,11 +156,11 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let interface_name: &str = try!(i.read());
-        let property_name: &str = try!(i.read());
-        let value: arg::Variant<Box<arg::RefArg>> = try!(i.read());
+        let interface_name: &str = r#try!(i.read());
+        let property_name: &str = r#try!(i.read());
+        let value: arg::Variant<Box<arg::RefArg>> = r#try!(i.read());
         let d = fclone(minfo);
-        try!(d.set(interface_name, property_name, value));
+        r#try!(d.set(interface_name, property_name, value));
         let rm = minfo.msg.method_return();
         Ok(vec!(rm))
     };
@@ -173,9 +173,9 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let interface_name: &str = try!(i.read());
+        let interface_name: &str = r#try!(i.read());
         let d = fclone(minfo);
-        let props = try!(d.get_all(interface_name));
+        let props = r#try!(d.get_all(interface_name));
         let rm = minfo.msg.method_return();
         let rm = rm.append1(props);
         Ok(vec!(rm))

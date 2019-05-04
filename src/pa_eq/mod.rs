@@ -1,8 +1,8 @@
 mod dbus_api;
 
-use cli::pa_eq::*;
-use utils::*;
-use Filter;
+use crate::cli::pa_eq::*;
+use crate::utils::*;
+use crate::Filter;
 
 use self::dbus_api::equalizing_manager::OrgPulseAudioExtEqualizing1Manager;
 use self::dbus_api::server_lookup::OrgPulseAudioServerLookup1;
@@ -17,7 +17,7 @@ use failure::{Error, ResultExt};
 struct NoEqualizedSink;
 
 pub fn main(cmd: Command) -> Result<(), Error> {
-    use cli::pa_eq::Command::*;
+    use crate::cli::pa_eq::Command::*;
 
     warn!("The PulseAudio equalizer has been deprecated for a while, and is known to sometimes cause crashes, latency or audible artifacts");
 

@@ -1,7 +1,7 @@
-use Filter;
+use crate::Filter;
 
-use cli::EqualizerConfFormat;
-use parsing::EqualizerApoParser;
+use crate::cli::EqualizerConfFormat;
+use crate::parsing::EqualizerApoParser;
 
 use failure::Error;
 use lalrpop_util;

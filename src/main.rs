@@ -29,7 +29,7 @@ mod pa_eq;
 #[cfg(feature = "pa-effects")]
 mod pa_effects;
 
-use cli::*;
+use crate::cli::*;
 
 use failure::Error;
 use structopt::StructOpt;
@@ -76,7 +76,7 @@ fn start() -> Result<(), Error> {
     let args = Cli::from_args();
     args.log.log_all(Some(args.verbose.log_level()))?;
 
-    use Command::*;
+    use crate::Command::*;
 
     match args.cmd {
         #[cfg(feature = "pa-eq")]

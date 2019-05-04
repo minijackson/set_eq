@@ -26,88 +26,88 @@ impl<'a, C: ::std::ops::Deref<Target=dbus::Connection>> OrgPulseAudioExtEqualizi
     type Err = dbus::Error;
 
     fn filter_at_points(&self, channel: u32, xs: Vec<u32>) -> Result<(Vec<f64>, f64), Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"FilterAtPoints".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"FilterAtPoints".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(channel);
             i.append(xs);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         let mut i = m.iter_init();
-        let ys: Vec<f64> = try!(i.read());
-        let preamp: f64 = try!(i.read());
+        let ys: Vec<f64> = r#try!(i.read());
+        let preamp: f64 = r#try!(i.read());
         Ok((ys, preamp))
     }
 
     fn seed_filter(&self, channel: u32, xs: Vec<u32>, ys: Vec<f64>, preamp: f64) -> Result<(), Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"SeedFilter".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"SeedFilter".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(channel);
             i.append(xs);
             i.append(ys);
             i.append(preamp);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         Ok(())
     }
 
     fn save_profile(&self, channel: u32, name: &str) -> Result<(), Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"SaveProfile".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"SaveProfile".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(channel);
             i.append(name);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         Ok(())
     }
 
     fn load_profile(&self, channel: u32, name: &str) -> Result<(), Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"LoadProfile".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"LoadProfile".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(channel);
             i.append(name);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         Ok(())
     }
 
     fn set_filter(&self, channel: u32, ys: Vec<f64>, preamp: f64) -> Result<(), Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"SetFilter".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"SetFilter".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(channel);
             i.append(ys);
             i.append(preamp);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         Ok(())
     }
 
     fn get_filter(&self, channel: u32) -> Result<(Vec<f64>, f64), Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"GetFilter".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"GetFilter".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(channel);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         let mut i = m.iter_init();
-        let ys: Vec<f64> = try!(i.read());
-        let preamp: f64 = try!(i.read());
+        let ys: Vec<f64> = r#try!(i.read());
+        let preamp: f64 = r#try!(i.read());
         Ok((ys, preamp))
     }
 
     fn save_state(&self) -> Result<(), Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"SaveState".into(), |_| {
+        let mut m = r#try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"SaveState".into(), |_| {
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         Ok(())
     }
 
     fn base_profile(&self, channel: u32) -> Result<String, Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"BaseProfile".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.PulseAudio.Ext.Equalizing1.Equalizer".into(), &"BaseProfile".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(channel);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         let mut i = m.iter_init();
-        let name: String = try!(i.read());
+        let name: String = r#try!(i.read());
         Ok(name)
     }
 
@@ -145,10 +145,10 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let channel: u32 = try!(i.read());
-        let xs: Vec<u32> = try!(i.read());
+        let channel: u32 = r#try!(i.read());
+        let xs: Vec<u32> = r#try!(i.read());
         let d = fclone(minfo);
-        let (ys, preamp) = try!(d.filter_at_points(channel, xs));
+        let (ys, preamp) = r#try!(d.filter_at_points(channel, xs));
         let rm = minfo.msg.method_return();
         let rm = rm.append1(ys);
         let rm = rm.append1(preamp);
@@ -164,12 +164,12 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let channel: u32 = try!(i.read());
-        let xs: Vec<u32> = try!(i.read());
-        let ys: Vec<f64> = try!(i.read());
-        let preamp: f64 = try!(i.read());
+        let channel: u32 = r#try!(i.read());
+        let xs: Vec<u32> = r#try!(i.read());
+        let ys: Vec<f64> = r#try!(i.read());
+        let preamp: f64 = r#try!(i.read());
         let d = fclone(minfo);
-        try!(d.seed_filter(channel, xs, ys, preamp));
+        r#try!(d.seed_filter(channel, xs, ys, preamp));
         let rm = minfo.msg.method_return();
         Ok(vec!(rm))
     };
@@ -183,10 +183,10 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let channel: u32 = try!(i.read());
-        let name: &str = try!(i.read());
+        let channel: u32 = r#try!(i.read());
+        let name: &str = r#try!(i.read());
         let d = fclone(minfo);
-        try!(d.save_profile(channel, name));
+        r#try!(d.save_profile(channel, name));
         let rm = minfo.msg.method_return();
         Ok(vec!(rm))
     };
@@ -198,10 +198,10 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let channel: u32 = try!(i.read());
-        let name: &str = try!(i.read());
+        let channel: u32 = r#try!(i.read());
+        let name: &str = r#try!(i.read());
         let d = fclone(minfo);
-        try!(d.load_profile(channel, name));
+        r#try!(d.load_profile(channel, name));
         let rm = minfo.msg.method_return();
         Ok(vec!(rm))
     };
@@ -213,11 +213,11 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let channel: u32 = try!(i.read());
-        let ys: Vec<f64> = try!(i.read());
-        let preamp: f64 = try!(i.read());
+        let channel: u32 = r#try!(i.read());
+        let ys: Vec<f64> = r#try!(i.read());
+        let preamp: f64 = r#try!(i.read());
         let d = fclone(minfo);
-        try!(d.set_filter(channel, ys, preamp));
+        r#try!(d.set_filter(channel, ys, preamp));
         let rm = minfo.msg.method_return();
         Ok(vec!(rm))
     };
@@ -230,9 +230,9 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let channel: u32 = try!(i.read());
+        let channel: u32 = r#try!(i.read());
         let d = fclone(minfo);
-        let (ys, preamp) = try!(d.get_filter(channel));
+        let (ys, preamp) = r#try!(d.get_filter(channel));
         let rm = minfo.msg.method_return();
         let rm = rm.append1(ys);
         let rm = rm.append1(preamp);
@@ -247,7 +247,7 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let d = fclone(minfo);
-        try!(d.save_state());
+        r#try!(d.save_state());
         let rm = minfo.msg.method_return();
         Ok(vec!(rm))
     };
@@ -257,9 +257,9 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let channel: u32 = try!(i.read());
+        let channel: u32 = r#try!(i.read());
         let d = fclone(minfo);
-        let name = try!(d.base_profile(channel));
+        let name = r#try!(d.base_profile(channel));
         let rm = minfo.msg.method_return();
         let rm = rm.append1(name);
         Ok(vec!(rm))
@@ -275,7 +275,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_interface_revision()));
+        a.append(r#try!(d.get_interface_revision()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -286,7 +286,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_sample_rate()));
+        a.append(r#try!(d.get_sample_rate()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -297,7 +297,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_filter_sample_rate()));
+        a.append(r#try!(d.get_filter_sample_rate()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -308,7 +308,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_nfilter_coefficients()));
+        a.append(r#try!(d.get_nfilter_coefficients()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -319,7 +319,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_nchannels()));
+        a.append(r#try!(d.get_nchannels()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -392,22 +392,22 @@ impl<'a, C: ::std::ops::Deref<Target=dbus::Connection>> OrgPulseAudioCore1Device
     type Err = dbus::Error;
 
     fn suspend(&self, suspend: bool) -> Result<(), Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.PulseAudio.Core1.Device".into(), &"Suspend".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.PulseAudio.Core1.Device".into(), &"Suspend".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(suspend);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         Ok(())
     }
 
     fn get_port_by_name(&self, name: &str) -> Result<dbus::Path<'static>, Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.PulseAudio.Core1.Device".into(), &"GetPortByName".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.PulseAudio.Core1.Device".into(), &"GetPortByName".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(name);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         let mut i = m.iter_init();
-        let port: dbus::Path<'static> = try!(i.read());
+        let port: dbus::Path<'static> = r#try!(i.read());
         Ok(port)
     }
 
@@ -537,9 +537,9 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let suspend: bool = try!(i.read());
+        let suspend: bool = r#try!(i.read());
         let d = fclone(minfo);
-        try!(d.suspend(suspend));
+        r#try!(d.suspend(suspend));
         let rm = minfo.msg.method_return();
         Ok(vec!(rm))
     };
@@ -550,9 +550,9 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let name: &str = try!(i.read());
+        let name: &str = r#try!(i.read());
         let d = fclone(minfo);
-        let port = try!(d.get_port_by_name(name));
+        let port = r#try!(d.get_port_by_name(name));
         let rm = minfo.msg.method_return();
         let rm = rm.append1(port);
         Ok(vec!(rm))
@@ -568,7 +568,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_index()));
+        a.append(r#try!(d.get_index()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -579,7 +579,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_name()));
+        a.append(r#try!(d.get_name()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -590,7 +590,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_driver()));
+        a.append(r#try!(d.get_driver()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -601,7 +601,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_owner_module()));
+        a.append(r#try!(d.get_owner_module()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -612,7 +612,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_card()));
+        a.append(r#try!(d.get_card()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -623,7 +623,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_sample_format()));
+        a.append(r#try!(d.get_sample_format()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -634,7 +634,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_sample_rate()));
+        a.append(r#try!(d.get_sample_rate()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -645,7 +645,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_channels()));
+        a.append(r#try!(d.get_channels()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -656,14 +656,14 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_volume()));
+        a.append(r#try!(d.get_volume()));
         Ok(())
     });
     let fclone = f.clone();
     let p = p.on_set(move |iter, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        try!(d.set_volume(try!(iter.read())));
+        r#try!(d.set_volume(r#try!(iter.read())));
         Ok(())
     });
     let i = i.add_p(p);
@@ -674,7 +674,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_has_flat_volume()));
+        a.append(r#try!(d.get_has_flat_volume()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -685,7 +685,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_has_convertible_to_decibel_volume()));
+        a.append(r#try!(d.get_has_convertible_to_decibel_volume()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -696,7 +696,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_base_volume()));
+        a.append(r#try!(d.get_base_volume()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -707,7 +707,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_volume_steps()));
+        a.append(r#try!(d.get_volume_steps()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -718,14 +718,14 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_mute()));
+        a.append(r#try!(d.get_mute()));
         Ok(())
     });
     let fclone = f.clone();
     let p = p.on_set(move |iter, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        try!(d.set_mute(try!(iter.read())));
+        r#try!(d.set_mute(r#try!(iter.read())));
         Ok(())
     });
     let i = i.add_p(p);
@@ -736,7 +736,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_has_hardware_volume()));
+        a.append(r#try!(d.get_has_hardware_volume()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -747,7 +747,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_has_hardware_mute()));
+        a.append(r#try!(d.get_has_hardware_mute()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -758,7 +758,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_configured_latency()));
+        a.append(r#try!(d.get_configured_latency()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -769,7 +769,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_has_dynamic_latency()));
+        a.append(r#try!(d.get_has_dynamic_latency()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -780,7 +780,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_latency()));
+        a.append(r#try!(d.get_latency()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -791,7 +791,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_is_hardware_device()));
+        a.append(r#try!(d.get_is_hardware_device()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -802,7 +802,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_is_network_device()));
+        a.append(r#try!(d.get_is_network_device()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -813,7 +813,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_state()));
+        a.append(r#try!(d.get_state()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -824,7 +824,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_ports()));
+        a.append(r#try!(d.get_ports()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -835,14 +835,14 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_active_port()));
+        a.append(r#try!(d.get_active_port()));
         Ok(())
     });
     let fclone = f.clone();
     let p = p.on_set(move |iter, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        try!(d.set_active_port(try!(iter.read())));
+        r#try!(d.set_active_port(r#try!(iter.read())));
         Ok(())
     });
     let i = i.add_p(p);
@@ -853,7 +853,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_property_list()));
+        a.append(r#try!(d.get_property_list()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -872,7 +872,7 @@ impl dbus::SignalArgs for OrgPulseAudioCore1DeviceVolumeUpdated {
         (&self.volume as &arg::RefArg).append(i);
     }
     fn get(&mut self, i: &mut arg::Iter) -> Result<(), arg::TypeMismatchError> {
-        self.volume = try!(i.read());
+        self.volume = r#try!(i.read());
         Ok(())
     }
 }
@@ -889,7 +889,7 @@ impl dbus::SignalArgs for OrgPulseAudioCore1DeviceMuteUpdated {
         (&self.muted as &arg::RefArg).append(i);
     }
     fn get(&mut self, i: &mut arg::Iter) -> Result<(), arg::TypeMismatchError> {
-        self.muted = try!(i.read());
+        self.muted = r#try!(i.read());
         Ok(())
     }
 }
@@ -906,7 +906,7 @@ impl dbus::SignalArgs for OrgPulseAudioCore1DeviceStateUpdated {
         (&self.state as &arg::RefArg).append(i);
     }
     fn get(&mut self, i: &mut arg::Iter) -> Result<(), arg::TypeMismatchError> {
-        self.state = try!(i.read());
+        self.state = r#try!(i.read());
         Ok(())
     }
 }
@@ -923,7 +923,7 @@ impl dbus::SignalArgs for OrgPulseAudioCore1DeviceActivePortUpdated {
         (&self.port as &arg::RefArg).append(i);
     }
     fn get(&mut self, i: &mut arg::Iter) -> Result<(), arg::TypeMismatchError> {
-        self.port = try!(i.read());
+        self.port = r#try!(i.read());
         Ok(())
     }
 }
@@ -940,7 +940,7 @@ impl dbus::SignalArgs for OrgPulseAudioCore1DevicePropertyListUpdated {
         (&self.property_list as &arg::RefArg).append(i);
     }
     fn get(&mut self, i: &mut arg::Iter) -> Result<(), arg::TypeMismatchError> {
-        self.property_list = try!(i.read());
+        self.property_list = r#try!(i.read());
         Ok(())
     }
 }
@@ -974,7 +974,7 @@ where
     let p = p.on_get(move |a, pinfo| {
         let minfo = pinfo.to_method_info();
         let d = fclone(&minfo);
-        a.append(try!(d.get_monitor_source()));
+        a.append(r#try!(d.get_monitor_source()));
         Ok(())
     });
     let i = i.add_p(p);
@@ -990,11 +990,11 @@ impl<'a, C: ::std::ops::Deref<Target=dbus::Connection>> OrgFreedesktopDBusIntros
     type Err = dbus::Error;
 
     fn introspect(&self) -> Result<String, Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.freedesktop.DBus.Introspectable".into(), &"Introspect".into(), |_| {
+        let mut m = r#try!(self.method_call_with_args(&"org.freedesktop.DBus.Introspectable".into(), &"Introspect".into(), |_| {
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         let mut i = m.iter_init();
-        let data: String = try!(i.read());
+        let data: String = r#try!(i.read());
         Ok(data)
     }
 }
@@ -1011,7 +1011,7 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let d = fclone(minfo);
-        let data = try!(d.introspect());
+        let data = r#try!(d.introspect());
         let rm = minfo.msg.method_return();
         let rm = rm.append1(data);
         Ok(vec!(rm))
@@ -1033,36 +1033,36 @@ impl<'a, C: ::std::ops::Deref<Target=dbus::Connection>> OrgFreedesktopDBusProper
     type Err = dbus::Error;
 
     fn get(&self, interface_name: &str, property_name: &str) -> Result<arg::Variant<Box<arg::RefArg>>, Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"Get".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"Get".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(interface_name);
             i.append(property_name);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         let mut i = m.iter_init();
-        let value: arg::Variant<Box<arg::RefArg>> = try!(i.read());
+        let value: arg::Variant<Box<arg::RefArg>> = r#try!(i.read());
         Ok(value)
     }
 
     fn set(&self, interface_name: &str, property_name: &str, value: arg::Variant<Box<arg::RefArg>>) -> Result<(), Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"Set".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"Set".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(interface_name);
             i.append(property_name);
             i.append(value);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         Ok(())
     }
 
     fn get_all(&self, interface_name: &str) -> Result<::std::collections::HashMap<String, arg::Variant<Box<arg::RefArg>>>, Self::Err> {
-        let mut m = try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"GetAll".into(), |msg| {
+        let mut m = r#try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"GetAll".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(interface_name);
         }));
-        try!(m.as_result());
+        r#try!(m.as_result());
         let mut i = m.iter_init();
-        let props: ::std::collections::HashMap<String, arg::Variant<Box<arg::RefArg>>> = try!(i.read());
+        let props: ::std::collections::HashMap<String, arg::Variant<Box<arg::RefArg>>> = r#try!(i.read());
         Ok(props)
     }
 }
@@ -1079,10 +1079,10 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let interface_name: &str = try!(i.read());
-        let property_name: &str = try!(i.read());
+        let interface_name: &str = r#try!(i.read());
+        let property_name: &str = r#try!(i.read());
         let d = fclone(minfo);
-        let value = try!(d.get(interface_name, property_name));
+        let value = r#try!(d.get(interface_name, property_name));
         let rm = minfo.msg.method_return();
         let rm = rm.append1(value);
         Ok(vec!(rm))
@@ -1096,11 +1096,11 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let interface_name: &str = try!(i.read());
-        let property_name: &str = try!(i.read());
-        let value: arg::Variant<Box<arg::RefArg>> = try!(i.read());
+        let interface_name: &str = r#try!(i.read());
+        let property_name: &str = r#try!(i.read());
+        let value: arg::Variant<Box<arg::RefArg>> = r#try!(i.read());
         let d = fclone(minfo);
-        try!(d.set(interface_name, property_name, value));
+        r#try!(d.set(interface_name, property_name, value));
         let rm = minfo.msg.method_return();
         Ok(vec!(rm))
     };
@@ -1113,9 +1113,9 @@ where
     let fclone = f.clone();
     let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
-        let interface_name: &str = try!(i.read());
+        let interface_name: &str = r#try!(i.read());
         let d = fclone(minfo);
-        let props = try!(d.get_all(interface_name));
+        let props = r#try!(d.get_all(interface_name));
         let rm = minfo.msg.method_return();
         let rm = rm.append1(props);
         Ok(vec!(rm))

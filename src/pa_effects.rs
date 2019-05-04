@@ -1,6 +1,6 @@
-use cli::pa_effects::*;
-use utils::*;
-use Filter;
+use crate::cli::pa_effects::*;
+use crate::utils::*;
+use crate::Filter;
 
 use failure::{Error, ResultExt};
 
@@ -11,7 +11,7 @@ use std::io::{self, Write};
 const DEFAULT_PRESET: &str = include_str!("../res/default-pa-effects-preset.json");
 
 pub fn main(cmd: Command) -> Result<(), Error> {
-    use cli::pa_effects::Command::*;
+    use crate::cli::pa_effects::Command::*;
 
     match cmd {
         ExportPreset(args) => export_preset(args),
