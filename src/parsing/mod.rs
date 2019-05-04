@@ -1,5 +1,5 @@
 lalrpop_mod!(
-    #[allow(clippy)]
+    #[allow(clippy::all)]
     equalizer_apo,
     "/parsing/equalizer_apo.rs"
 );

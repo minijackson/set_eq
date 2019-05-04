@@ -1,4 +1,4 @@
-use ::Filter;
+use crate::Filter;
 
 use std::str::FromStr;
 
