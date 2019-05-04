@@ -44,12 +44,12 @@ where
     D::Method: Default,
     D::Property: Default,
     T: OrgPulseAudioExtEqualizing1Manager<Err=tree::MethodErr>,
-    F: 'static + for <'z> Fn(& 'z tree::MethodInfo<tree::MTFn<D>, D>) -> & 'z T,
+    F: 'static + for <'z> Fn(& 'z tree::MethodInfo<'_, tree::MTFn<D>, D>) -> & 'z T,
 {
     let i = factory.interface("org.PulseAudio.Ext.Equalizing1.Manager", data);
     let f = ::std::sync::Arc::new(f);
     let fclone = f.clone();
-    let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
+    let h = move |minfo: &tree::MethodInfo<'_, tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
         let name: &str = r#try!(i.read());
         let d = fclone(minfo);
@@ -72,7 +72,7 @@ where
     });
     let i = i.add_p(p);
 
-    let p = factory.property::<Vec<dbus::Path>, _>("EqualizedSinks", Default::default());
+    let p = factory.property::<Vec<dbus::Path<'_>>, _>("EqualizedSinks", Default::default());
     let p = p.access(tree::Access::Read);
     let fclone = f.clone();
     let p = p.on_get(move |a, pinfo| {
@@ -104,10 +104,10 @@ pub struct OrgPulseAudioExtEqualizing1ManagerSinkAdded {
 impl dbus::SignalArgs for OrgPulseAudioExtEqualizing1ManagerSinkAdded {
     const NAME: &'static str = "SinkAdded";
     const INTERFACE: &'static str = "org.PulseAudio.Ext.Equalizing1.Manager";
-    fn append(&self, i: &mut arg::IterAppend) {
-        (&self.sink as &arg::RefArg).append(i);
+    fn append(&self, i: &mut arg::IterAppend<'_>) {
+        (&self.sink as &dyn arg::RefArg).append(i);
     }
-    fn get(&mut self, i: &mut arg::Iter) -> Result<(), arg::TypeMismatchError> {
+    fn get(&mut self, i: &mut arg::Iter<'_>) -> Result<(), arg::TypeMismatchError> {
         self.sink = r#try!(i.read());
         Ok(())
     }
@@ -121,10 +121,10 @@ pub struct OrgPulseAudioExtEqualizing1ManagerSinkRemoved {
 impl dbus::SignalArgs for OrgPulseAudioExtEqualizing1ManagerSinkRemoved {
     const NAME: &'static str = "SinkRemoved";
     const INTERFACE: &'static str = "org.PulseAudio.Ext.Equalizing1.Manager";
-    fn append(&self, i: &mut arg::IterAppend) {
-        (&self.sink as &arg::RefArg).append(i);
+    fn append(&self, i: &mut arg::IterAppend<'_>) {
+        (&self.sink as &dyn arg::RefArg).append(i);
     }
-    fn get(&mut self, i: &mut arg::Iter) -> Result<(), arg::TypeMismatchError> {
+    fn get(&mut self, i: &mut arg::Iter<'_>) -> Result<(), arg::TypeMismatchError> {
         self.sink = r#try!(i.read());
         Ok(())
     }
@@ -137,9 +137,9 @@ pub struct OrgPulseAudioExtEqualizing1ManagerProfilesChanged {
 impl dbus::SignalArgs for OrgPulseAudioExtEqualizing1ManagerProfilesChanged {
     const NAME: &'static str = "ProfilesChanged";
     const INTERFACE: &'static str = "org.PulseAudio.Ext.Equalizing1.Manager";
-    fn append(&self, _: &mut arg::IterAppend) {
+    fn append(&self, _: &mut arg::IterAppend<'_>) {
     }
-    fn get(&mut self, _: &mut arg::Iter) -> Result<(), arg::TypeMismatchError> {
+    fn get(&mut self, _: &mut arg::Iter<'_>) -> Result<(), arg::TypeMismatchError> {
         Ok(())
     }
 }
@@ -167,12 +167,12 @@ where
     D: tree::DataType,
     D::Method: Default,
     T: OrgFreedesktopDBusIntrospectable<Err=tree::MethodErr>,
-    F: 'static + for <'z> Fn(& 'z tree::MethodInfo<tree::MTFn<D>, D>) -> & 'z T,
+    F: 'static + for <'z> Fn(& 'z tree::MethodInfo<'_, tree::MTFn<D>, D>) -> & 'z T,
 {
     let i = factory.interface("org.freedesktop.DBus.Introspectable", data);
     let f = ::std::sync::Arc::new(f);
     let fclone = f.clone();
-    let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
+    let h = move |minfo: &tree::MethodInfo<'_, tree::MTFn<D>, D>| {
         let d = fclone(minfo);
         let data = r#try!(d.introspect());
         let rm = minfo.msg.method_return();
@@ -187,15 +187,15 @@ where
 
 pub trait OrgFreedesktopDBusProperties {
     type Err;
-    fn get(&self, interface_name: &str, property_name: &str) -> Result<arg::Variant<Box<arg::RefArg>>, Self::Err>;
-    fn set(&self, interface_name: &str, property_name: &str, value: arg::Variant<Box<arg::RefArg>>) -> Result<(), Self::Err>;
-    fn get_all(&self, interface_name: &str) -> Result<::std::collections::HashMap<String, arg::Variant<Box<arg::RefArg>>>, Self::Err>;
+    fn get(&self, interface_name: &str, property_name: &str) -> Result<arg::Variant<Box<dyn arg::RefArg>>, Self::Err>;
+    fn set(&self, interface_name: &str, property_name: &str, value: arg::Variant<Box<dyn arg::RefArg>>) -> Result<(), Self::Err>;
+    fn get_all(&self, interface_name: &str) -> Result<::std::collections::HashMap<String, arg::Variant<Box<dyn arg::RefArg>>>, Self::Err>;
 }
 
 impl<'a, C: ::std::ops::Deref<Target=dbus::Connection>> OrgFreedesktopDBusProperties for dbus::ConnPath<'a, C> {
     type Err = dbus::Error;
 
-    fn get(&self, interface_name: &str, property_name: &str) -> Result<arg::Variant<Box<arg::RefArg>>, Self::Err> {
+    fn get(&self, interface_name: &str, property_name: &str) -> Result<arg::Variant<Box<dyn arg::RefArg>>, Self::Err> {
         let mut m = r#try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"Get".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(interface_name);
@@ -203,11 +203,11 @@ impl<'a, C: ::std::ops::Deref<Target=dbus::Connection>> OrgFreedesktopDBusProper
         }));
         r#try!(m.as_result());
         let mut i = m.iter_init();
-        let value: arg::Variant<Box<arg::RefArg>> = r#try!(i.read());
+        let value: arg::Variant<Box<dyn arg::RefArg>> = r#try!(i.read());
         Ok(value)
     }
 
-    fn set(&self, interface_name: &str, property_name: &str, value: arg::Variant<Box<arg::RefArg>>) -> Result<(), Self::Err> {
+    fn set(&self, interface_name: &str, property_name: &str, value: arg::Variant<Box<dyn arg::RefArg>>) -> Result<(), Self::Err> {
         let mut m = r#try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"Set".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(interface_name);
@@ -218,14 +218,14 @@ impl<'a, C: ::std::ops::Deref<Target=dbus::Connection>> OrgFreedesktopDBusProper
         Ok(())
     }
 
-    fn get_all(&self, interface_name: &str) -> Result<::std::collections::HashMap<String, arg::Variant<Box<arg::RefArg>>>, Self::Err> {
+    fn get_all(&self, interface_name: &str) -> Result<::std::collections::HashMap<String, arg::Variant<Box<dyn arg::RefArg>>>, Self::Err> {
         let mut m = r#try!(self.method_call_with_args(&"org.freedesktop.DBus.Properties".into(), &"GetAll".into(), |msg| {
             let mut i = arg::IterAppend::new(msg);
             i.append(interface_name);
         }));
         r#try!(m.as_result());
         let mut i = m.iter_init();
-        let props: ::std::collections::HashMap<String, arg::Variant<Box<arg::RefArg>>> = r#try!(i.read());
+        let props: ::std::collections::HashMap<String, arg::Variant<Box<dyn arg::RefArg>>> = r#try!(i.read());
         Ok(props)
     }
 }
@@ -235,12 +235,12 @@ where
     D: tree::DataType,
     D::Method: Default,
     T: OrgFreedesktopDBusProperties<Err=tree::MethodErr>,
-    F: 'static + for <'z> Fn(& 'z tree::MethodInfo<tree::MTFn<D>, D>) -> & 'z T,
+    F: 'static + for <'z> Fn(& 'z tree::MethodInfo<'_, tree::MTFn<D>, D>) -> & 'z T,
 {
     let i = factory.interface("org.freedesktop.DBus.Properties", data);
     let f = ::std::sync::Arc::new(f);
     let fclone = f.clone();
-    let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
+    let h = move |minfo: &tree::MethodInfo<'_, tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
         let interface_name: &str = r#try!(i.read());
         let property_name: &str = r#try!(i.read());
@@ -257,11 +257,11 @@ where
     let i = i.add_m(m);
 
     let fclone = f.clone();
-    let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
+    let h = move |minfo: &tree::MethodInfo<'_, tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
         let interface_name: &str = r#try!(i.read());
         let property_name: &str = r#try!(i.read());
-        let value: arg::Variant<Box<arg::RefArg>> = r#try!(i.read());
+        let value: arg::Variant<Box<dyn arg::RefArg>> = r#try!(i.read());
         let d = fclone(minfo);
         r#try!(d.set(interface_name, property_name, value));
         let rm = minfo.msg.method_return();
@@ -274,7 +274,7 @@ where
     let i = i.add_m(m);
 
     let fclone = f.clone();
-    let h = move |minfo: &tree::MethodInfo<tree::MTFn<D>, D>| {
+    let h = move |minfo: &tree::MethodInfo<'_, tree::MTFn<D>, D>| {
         let mut i = minfo.msg.iter_init();
         let interface_name: &str = r#try!(i.read());
         let d = fclone(minfo);

@@ -69,13 +69,13 @@ fn connect_impl() -> Result<Connection, Error> {
     Ok(Connection::open_private(&pulse_sock_path)?)
 }
 
-fn get_equalized_sink(conn: &Connection) -> Result<ConnPath<&Connection>, Error> {
+fn get_equalized_sink(conn: &Connection) -> Result<ConnPath<'_, &Connection>, Error> {
     Ok(get_equalized_sink_impl(conn).context(
         "Could not find an equalized sink. Have you loaded the 'module-equalizer-sink' module?",
     )?)
 }
 
-fn get_equalized_sink_impl(conn: &Connection) -> Result<ConnPath<&Connection>, Error> {
+fn get_equalized_sink_impl(conn: &Connection) -> Result<ConnPath<'_, &Connection>, Error> {
     let conn_manager = conn.with_path("org.PulseAudio.Core1", "/org/pulseaudio/equalizing1", 2000);
 
     // TODO: make that a command-line option
@@ -88,7 +88,7 @@ fn get_equalized_sink_impl(conn: &Connection) -> Result<ConnPath<&Connection>, E
     Ok(conn.with_path("org.PulseAudio.Core1", sink_path, 2000))
 }
 
-fn send_filter(conn_sink: &ConnPath<&Connection>, filter: Filter) -> Result<(), Error> {
+fn send_filter(conn_sink: &ConnPath<'_, &Connection>, filter: Filter) -> Result<(), Error> {
     let channel = conn_sink.get_nchannels()?;
     info!("Using channel: {}", channel);
     trace!("Sending filter: {:?}", filter);

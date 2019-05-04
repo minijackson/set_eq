@@ -5,8 +5,8 @@ extern crate failure;
 
 #[macro_use]
 extern crate clap;
-extern crate clap_log_flag;
-extern crate clap_verbosity_flag;
+
+
 #[macro_use]
 extern crate structopt;
 
