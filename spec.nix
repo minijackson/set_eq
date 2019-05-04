@@ -24,7 +24,7 @@ in {
         "keepnr": 10,
         "inputs": {
             "src": { "type": "git", "value": "https://git.huh.gdn/set_eq/ master", "emailresponsible": true },
-            "nixpkgs": { "type": "git", "value": "https://github.com/nixos/nixpkgs-channels nixos-18.09", "emailresponsible": false }
+            "nixpkgs": { "type": "git", "value": "https://github.com/nixos/nixpkgs-channels nixos-19.03", "emailresponsible": false }
         }
       }
     }
