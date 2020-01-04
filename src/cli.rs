@@ -1,15 +1,15 @@
-use clap_log_flag;
-use clap_verbosity_flag;
 use structopt;
+use structopt::clap::arg_enum;
 
 #[derive(StructOpt, Debug)]
-#[structopt(raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
 /// A command-line tool to manipulate PulseAudio's equalizers
 pub struct Cli {
-    #[structopt(flatten)]
-    pub verbose: clap_verbosity_flag::Verbosity,
-    #[structopt(flatten)]
-    pub log: clap_log_flag::Log,
+    #[structopt(long, short, parse(from_occurrences))]
+    /// Pass many times for more log output
+    ///
+    /// By default, it'll only report errors and warnings. Passing `-v` one time
+    /// also prints infos, `-vv` enables debug logging, and `-vvv` trace.
+    pub verbose: u8,
     #[structopt(subcommand)]
     pub cmd: Command,
 }
@@ -61,10 +61,8 @@ pub mod pa_eq {
         #[structopt(
             short = "f",
             long = "format",
-            raw(
-                possible_values = "&EqualizerConfFormat::variants()",
-                case_insensitive = "true"
-            ),
+            possible_values = &EqualizerConfFormat::variants(),
+            case_insensitive = true,
             default_value = "EqualizerAPO"
         )]
         /// The file format of the equalizer configuration
@@ -84,7 +82,6 @@ pub mod pa_eq {
         /// By default it will use the last equalized sink it finds
         pub sink: Option<String>,
     }
-
 }
 
 #[cfg(feature = "pa-effects")]
@@ -108,10 +105,8 @@ pub mod pa_effects {
         #[structopt(
             short = "f",
             long = "format",
-            raw(
-                possible_values = "&EqualizerConfFormat::variants()",
-                case_insensitive = "true"
-            ),
+            possible_values = &EqualizerConfFormat::variants(),
+            case_insensitive = true,
             default_value = "EqualizerAPO"
         )]
         /// The file format of the equalizer configuration
@@ -126,5 +121,4 @@ pub mod pa_effects {
         /// Write the preset to the given file instead of the standard output
         pub output: Option<String>,
     }
-
 }

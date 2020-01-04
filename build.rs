@@ -1,15 +1,11 @@
 extern crate lalrpop;
 
 #[macro_use]
-extern crate clap;
-extern crate clap_log_flag;
-extern crate clap_verbosity_flag;
-#[macro_use]
 extern crate structopt;
 
 use structopt::StructOpt;
 
-use clap::Shell;
+use structopt::clap::Shell;
 
 use std::env;
 

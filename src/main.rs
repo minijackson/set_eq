@@ -4,10 +4,6 @@ extern crate log;
 extern crate failure;
 
 #[macro_use]
-extern crate clap;
-
-
-#[macro_use]
 extern crate structopt;
 
 #[macro_use]
@@ -74,7 +70,18 @@ fn main() {
 
 fn start() -> Result<(), Error> {
     let args = Cli::from_args();
-    args.log.log_all(Some(args.verbose.log_level()))?;
+    pretty_env_logger::formatted_builder()
+        .filter(
+            None,
+            match args.verbose {
+                0 => log::LevelFilter::Warn,
+                1 => log::LevelFilter::Info,
+                2 => log::LevelFilter::Debug,
+                _ => log::LevelFilter::Trace,
+            },
+        )
+        .try_init()?;
+
 
     use crate::Command::*;
 
