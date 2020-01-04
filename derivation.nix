@@ -16,15 +16,6 @@ rustPlatform.buildRustPackage rec {
     cp target/release/build/set_eq-*/out/_set_eq     "$out/share/zsh/site-functions/"
   '';
 
-  checkPhase = ''
-    runHook preCheck
-
-    echo "Running cargo test --release"
-    cargo test --release
-
-    runHook postCheck
-  '';
-
   meta = with stdenv.lib; {
     description = "A command-line tool to manipulate PulseAudio's equalizer";
     homepage = https://github.com/minijackson/set_eq;
