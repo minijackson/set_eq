@@ -53,6 +53,9 @@ fn filter_to_eq_preset(mut filter: Filter) -> serde_json::Value {
         "num-bands": filter.frequencies.len(),
         "input-gain": 0,
         "output-gain": 0,
+        "split-channels": false,
+        "left": {},
+        "right": {},
     });
 
     for (i, (frequency, coeff)) in filter
@@ -61,11 +64,17 @@ fn filter_to_eq_preset(mut filter: Filter) -> serde_json::Value {
         .zip(filter.coefficients)
         .enumerate()
     {
-        equalizer[format!("band{}", i)] = json!({
+        let peak = json!({
             "gain": coeff,
             "frequency": frequency,
-            "type": "peak",
+            "type": "Bell",
+            "mode": "RLC (BT)",
+            "slope": "x1",
+            "solo": "false",
+            "mute": "false",
         });
+        equalizer["left"][format!("band{}", i)] = peak.clone();
+        equalizer["right"][format!("band{}", i)] = peak;
     }
 
     equalizer
