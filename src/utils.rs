@@ -67,34 +67,3 @@ where
         message: format!("{}", error),
     }
 }
-
-pub fn decibel_to_ratio(decibel: f64) -> f64 {
-    10f64.powf(decibel / 10f64).sqrt()
-}
-
-/*
-fn introspect(conn: &dbus::ConnPath<&Connection>) {
-    let mut thing = conn
-        .method_call_with_args(
-            &"org.freedesktop.DBus.Introspectable".into(),
-            &"Introspect".into(),
-            |_| {},
-        ).unwrap();
-    thing.as_result().unwrap();
-
-    println!("{}", thing.iter_init().read::<String>().unwrap());
-}
-*/
-
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn decibel_to_ratio() {
-        assert_eq!(super::decibel_to_ratio(0f64), 1f64);
-        assert_eq!(super::decibel_to_ratio(20f64), 10f64);
-        assert_eq!(super::decibel_to_ratio(40f64), 100f64);
-        assert_eq!(super::decibel_to_ratio(60f64), 1000f64);
-    }
-
-}

@@ -1,19 +1,19 @@
-{ stdenv, rustPlatform, dbus, pkgconfig, ... }:
+{ stdenv, rustPlatform, dbus, installShellFiles, ... }:
 
 rustPlatform.buildRustPackage rec {
   name = "set_eq-${version}";
   version = "0.1.0";
 
-  buildInputs = [ dbus pkgconfig ];
+  nativeBuildInputs = [ installShellFiles ];
+  buildInputs = [ dbus ];
 
   src = ./.;
-  cargoSha256 = "094jq6mlhdgc204xjrp233dckvwmmpbivr59jcpfrl7shchclrd2";
+  cargoSha256 = "0639d4b5f3vxljinm59vh7kfvqqm07iah90gqb10l91xpc9lj2b5";
 
-  preFixup = ''
-    mkdir -p "$out/share/"{bash-completion/completions,fish/vendor_completions.d,zsh/site-functions}
-    cp target/release/build/set_eq-*/out/set_eq.bash "$out/share/bash-completion/completions/"
-    cp target/release/build/set_eq-*/out/set_eq.fish "$out/share/fish/vendor_completions.d/"
-    cp target/release/build/set_eq-*/out/_set_eq     "$out/share/zsh/site-functions/"
+  postInstall = ''
+    installShellCompletion --bash target/release/build/set_eq-*/out/set_eq.bash
+    installShellCompletion --fish target/release/build/set_eq-*/out/set_eq.fish
+    installShellCompletion --zsh  target/release/build/set_eq-*/out/_set_eq
   '';
 
   meta = with stdenv.lib; {

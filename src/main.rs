@@ -20,8 +20,6 @@ mod cli;
 mod parsing;
 mod utils;
 
-#[cfg(feature = "pa-eq")]
-mod pa_eq;
 #[cfg(feature = "pa-effects")]
 mod pa_effects;
 
@@ -35,24 +33,6 @@ pub struct Filter {
     preamp: f64,
     frequencies: Vec<u32>,
     coefficients: Vec<f64>,
-}
-
-impl Filter {
-    fn pad(self, filter_rate: u32) -> Self {
-        Filter {
-            preamp: self.preamp,
-            frequencies: vec![0u32]
-                .into_iter()
-                .chain(self.frequencies.into_iter())
-                .chain(vec![filter_rate / 2u32])
-                .collect(),
-            coefficients: vec![1f64]
-                .into_iter()
-                .chain(self.coefficients.into_iter())
-                .chain(vec![1f64])
-                .collect(),
-        }
-    }
 }
 
 fn main() {

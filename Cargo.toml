@@ -8,21 +8,19 @@ description = "A command-line tool to manipulate PulseAudio's equalizers"
 edition = "2018"
 
 [features]
-default = ["pa-eq", "pa-effects"]
+default = ["pa-effects"]
 
-pa-eq = ["dbus"]
 pa-effects = ["serde_json"]
 
 [dependencies]
-dbus = { version = "0.6", optional = true }
 failure = "0.1"
-lalrpop-util = "0.17"
+lalrpop-util = "0.19"
 log = "0.4"
-pretty_env_logger = "0.3"
+pretty_env_logger = "0.4"
 regex = "1"
 serde_json = { version = "1", optional = true }
 structopt = "0.3"
 
 [build-dependencies]
-lalrpop = "0.17"
+lalrpop = "0.19"
 structopt = "0.3"
